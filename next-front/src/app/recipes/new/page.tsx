@@ -58,9 +58,7 @@ export default function NewRecipePage({}) {
   const [isRecording, setIsRecording] = useState(false);
   const [transcript, setTranscript] = useState("");
   const [isProcessingAi, setIsProcessingAi] = useState(false);
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const audioChunksRef = useRef<Blob[]>([]);
-
+  const [previous, setPrevious] = useState<string>("");
   const {
     completion,
     input,
@@ -72,8 +70,6 @@ export default function NewRecipePage({}) {
     api: "/api/ai",
     streamProtocol: "text",
   });
-
-  const animatedText = useAnimatedText(completion);
 
   const {
     register,
@@ -213,7 +209,8 @@ export default function NewRecipePage({}) {
     console.log(input);
     if (input.trim()) {
       console.log(input);
-      complete(input);
+      complete("current-input" + input + "previous input" + previous);
+      setPrevious(input);
     }
   };
 
@@ -297,13 +294,13 @@ export default function NewRecipePage({}) {
             )}
 
             {completion && (
-              <div className="mt-6 p-4 bg-gray-50 rounded-lg">
+              <div className="mt-6 p-4 bg-gray-50 rounded-lg w-fit">
                 <h3 className="text-lg font-semibold mb-2">
                   Generated Recipe:
                 </h3>
                 <div className="prose prose-sm">
                   <pre className="text-sm whitespace-pre-wrap">
-                    {animatedText}
+                    {completion}
                   </pre>
                 </div>
               </div>

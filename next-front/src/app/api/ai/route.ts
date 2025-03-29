@@ -1,8 +1,7 @@
 import { openai } from "@ai-sdk/openai";
-import { generateObject, generateText } from "ai";
+import { generateObject, generateText, streamText } from "ai";
 import z from "zod";
-import { addToDbPrompt, chooseTools } from "@/config/prompt";
-import { NextResponse } from "next/server";
+import { addToDbPrompt, chooseTools, enhancePropmt } from "@/config/prompt";
 export const maxDuration = 30;
 
 export async function POST(req: Request) {
@@ -16,9 +15,7 @@ export async function POST(req: Request) {
     }),
   });
 
-  return NextResponse.json(
-    multiToolCalling((await result).object.tool, prompt)
-  );
+  return multiToolCalling((await result).object.tool, prompt);
 }
 
 const multiToolCalling = async (tool: string, input: string) => {
@@ -65,6 +62,13 @@ const multiToolCalling = async (tool: string, input: string) => {
         body: JSON.stringify(recipeData),
       });
 
-      return response.json();
+      return (await recipe).toJsonResponse();
+    case "enhance-recipe":
+      const questionToEnhance = streamText({
+        model: openai("gpt-4o"),
+        prompt: enhancePropmt + input,
+      });
+
+      return questionToEnhance.toTextStreamResponse();
   }
 };
