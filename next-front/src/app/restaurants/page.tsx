@@ -3,6 +3,7 @@
 import { useState, useCallback } from 'react';
 import { GoogleMap, useJsApiLoader, Marker, InfoWindow, Circle } from '@react-google-maps/api';
 import { Clock, Navigation, Star, Phone, MapPin } from 'lucide-react';
+import { GridBackground } from '@/components/ui/grid-background';
 
 const containerStyle = {
   width: '100%',
@@ -162,128 +163,131 @@ export default function RestaurantsPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="mb-8">
-        <h1 className="text-4xl font-bold text-gray-900 mb-2">Найти ближайшие рестораны</h1>
-        <p className="text-gray-600">Время доставки рассчитано с учетом текущего трафика</p>
-      </div>
+    <div className="relative min-h-screen bg-white">
+      <GridBackground />
+      <div className="container relative z-10 mx-auto px-4 py-8">
+        <div className="mb-8">
+          <h1 className="text-4xl font-bold text-gray-900 mb-2">Find Nearby Restaurants</h1>
+          <p className="text-gray-600">Delivery time calculated with current traffic</p>
+        </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2">
-          <div className="rounded-xl overflow-hidden shadow-lg bg-white">
-            <GoogleMap
-              mapContainerStyle={containerStyle}
-              center={userLocation || defaultCenter}
-              zoom={14}
-              onLoad={onLoad}
-              onUnmount={onUnmount}
-              options={{
-                disableDefaultUI: true,
-                zoomControl: true,
-                streetViewControl: true,
-                mapTypeControl: true,
-              }}
-            >
-              {userLocation && (
-                <>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="lg:col-span-2">
+            <div className="rounded-xl overflow-hidden shadow-lg bg-white">
+              <GoogleMap
+                mapContainerStyle={containerStyle}
+                center={userLocation || defaultCenter}
+                zoom={14}
+                onLoad={onLoad}
+                onUnmount={onUnmount}
+                options={{
+                  disableDefaultUI: true,
+                  zoomControl: true,
+                  streetViewControl: true,
+                  mapTypeControl: true,
+                }}
+              >
+                {userLocation && (
+                  <>
+                    <Marker
+                      position={userLocation}
+                      icon={{
+                        url: '/chelovechek.png',
+                        scaledSize: new window.google.maps.Size(60, 60)
+                      }}
+                    />
+                    <Circle
+                      center={userLocation}
+                      radius={5000}
+                      options={{
+                        fillColor: '#ff8c0033',
+                        fillOpacity: 0.2,
+                        strokeColor: '#ff8c00',
+                        strokeOpacity: 0.8,
+                        strokeWeight: 2,
+                      }}
+                    />
+                  </>
+                )}
+
+                {restaurants.map((restaurant, index) => (
                   <Marker
-                    position={userLocation}
-                    icon={{
-                      url: '/chelovechek.png',
-                      scaledSize: new window.google.maps.Size(60, 60)
-                    }}
+                    key={index}
+                    position={restaurant.position}
+                    onClick={() => setSelectedRestaurant(restaurant)}
                   />
-                  <Circle
-                    center={userLocation}
-                    radius={5000}
-                    options={{
-                      fillColor: '#ff8c0033',
-                      fillOpacity: 0.2,
-                      strokeColor: '#ff8c00',
-                      strokeOpacity: 0.8,
-                      strokeWeight: 2,
+                ))}
+
+                {selectedRestaurant && (
+                  <InfoWindow
+                    position={selectedRestaurant.position}
+                    onCloseClick={() => setSelectedRestaurant(null)}
+                  >
+                    <div className="p-3">
+                      <h3 className="font-semibold text-lg mb-2">{selectedRestaurant.name}</h3>
+                      <div className="space-y-2 text-sm">
+                        <p className="flex items-center gap-2">
+                          <MapPin className="w-4 h-4 text-orange-500" />
+                          <span>{selectedRestaurant.address}</span>
+                        </p>
+                        <p className="flex items-center gap-2">
+                          <Clock className="w-4 h-4 text-orange-500" />
+                          <span>Время доставки: {formatDuration(selectedRestaurant.duration)}</span>
+                        </p>
+                        {selectedRestaurant.rating && (
+                          <p className="flex items-center gap-2">
+                            <Star className="w-4 h-4 text-orange-500" />
+                            <span>Рейтинг: {selectedRestaurant.rating}</span>
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </InfoWindow>
+                )}
+              </GoogleMap>
+            </div>
+          </div>
+
+          <div className="space-y-6">
+            <div className="bg-white rounded-xl p-4 shadow-lg">
+              <h2 className="text-xl font-semibold mb-4">Ближайшие рестораны</h2>
+              <div className="space-y-4 max-h-[60vh] overflow-y-auto">
+                {restaurants.map((restaurant, index) => (
+                  <div
+                    key={index}
+                    className={`p-4 rounded-lg border transition-all cursor-pointer
+                      ${selectedRestaurant?.name === restaurant.name
+                        ? 'border-orange-500 bg-orange-50'
+                        : 'border-gray-200 hover:border-orange-300'}`}
+                    onClick={() => {
+                      setSelectedRestaurant(restaurant);
+                      map?.panTo(restaurant.position);
                     }}
-                  />
-                </>
-              )}
-
-              {restaurants.map((restaurant, index) => (
-                <Marker
-                  key={index}
-                  position={restaurant.position}
-                  onClick={() => setSelectedRestaurant(restaurant)}
-                />
-              ))}
-
-              {selectedRestaurant && (
-                <InfoWindow
-                  position={selectedRestaurant.position}
-                  onCloseClick={() => setSelectedRestaurant(null)}
-                >
-                  <div className="p-3">
-                    <h3 className="font-semibold text-lg mb-2">{selectedRestaurant.name}</h3>
-                    <div className="space-y-2 text-sm">
+                  >
+                    <h3 className="font-semibold text-lg mb-2">{restaurant.name}</h3>
+                    <div className="space-y-2 text-sm text-gray-600">
                       <p className="flex items-center gap-2">
-                        <MapPin className="w-4 h-4 text-orange-500" />
-                        <span>{selectedRestaurant.address}</span>
+                        <Navigation className="w-4 h-4 text-orange-500" />
+                        <span>{formatDistance(restaurant.distance)}</span>
                       </p>
                       <p className="flex items-center gap-2">
                         <Clock className="w-4 h-4 text-orange-500" />
-                        <span>Время доставки: {formatDuration(selectedRestaurant.duration)}</span>
+                        <span>Время доставки: {formatDuration(restaurant.duration)}</span>
                       </p>
-                      {selectedRestaurant.rating && (
+                      {restaurant.rating && (
                         <p className="flex items-center gap-2">
                           <Star className="w-4 h-4 text-orange-500" />
-                          <span>Рейтинг: {selectedRestaurant.rating}</span>
+                          <span>{restaurant.rating}</span>
                         </p>
                       )}
+                      <p className="flex items-center gap-2">
+                        <MapPin className="w-4 h-4 text-orange-500" />
+                        <span>{restaurant.address}</span>
+                      </p>
                     </div>
                   </div>
-                </InfoWindow>
-              )}
-            </GoogleMap>
-          </div>
-        </div>
-
-        <div className="space-y-6">
-          <div className="bg-white rounded-xl p-4 shadow-lg">
-            <h2 className="text-xl font-semibold mb-4">Ближайшие рестораны</h2>
-            <div className="space-y-4 max-h-[60vh] overflow-y-auto">
-              {restaurants.map((restaurant, index) => (
-                <div
-                  key={index}
-                  className={`p-4 rounded-lg border transition-all cursor-pointer
-                    ${selectedRestaurant?.name === restaurant.name
-                      ? 'border-orange-500 bg-orange-50'
-                      : 'border-gray-200 hover:border-orange-300'}`}
-                  onClick={() => {
-                    setSelectedRestaurant(restaurant);
-                    map?.panTo(restaurant.position);
-                  }}
-                >
-                  <h3 className="font-semibold text-lg mb-2">{restaurant.name}</h3>
-                  <div className="space-y-2 text-sm text-gray-600">
-                    <p className="flex items-center gap-2">
-                      <Navigation className="w-4 h-4 text-orange-500" />
-                      <span>{formatDistance(restaurant.distance)}</span>
-                    </p>
-                    <p className="flex items-center gap-2">
-                      <Clock className="w-4 h-4 text-orange-500" />
-                      <span>Время доставки: {formatDuration(restaurant.duration)}</span>
-                    </p>
-                    {restaurant.rating && (
-                      <p className="flex items-center gap-2">
-                        <Star className="w-4 h-4 text-orange-500" />
-                        <span>{restaurant.rating}</span>
-                      </p>
-                    )}
-                    <p className="flex items-center gap-2">
-                      <MapPin className="w-4 h-4 text-orange-500" />
-                      <span>{restaurant.address}</span>
-                    </p>
-                  </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           </div>
         </div>

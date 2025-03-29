@@ -8,6 +8,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Loader2, ArrowLeft } from 'lucide-react';
 import { API_ENDPOINTS } from '@/config/api';
+import { GridBackground } from '@/components/ui/grid-background';
 
 const recipeSchema = z.object({
   title: z.string().min(1, 'Title is required').max(100),
@@ -121,192 +122,197 @@ export default function EditRecipePage({ params }: { params: Promise<{ id: strin
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
-      <div className="container mx-auto max-w-3xl px-4">
-        <div className="mb-8 flex items-center gap-4">
-          <button
-            onClick={() => router.back()}
-            className="flex items-center gap-2 text-gray-600 hover:text-orange-500"
-          >
-            <ArrowLeft className="h-5 w-5" />
-            Back
-          </button>
-          <h1 className="text-3xl font-bold text-gray-900">Edit Recipe</h1>
-        </div>
-
-        <div className="rounded-xl bg-white p-8 shadow-sm">
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
-            {/* Basic Information */}
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Title</label>
-                <input
-                  type="text"
-                  {...register('title')}
-                  className="mt-1 w-full rounded-lg border border-gray-300 p-2 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500"
-                />
-                {errors.title && (
-                  <p className="mt-1 text-sm text-red-500">{errors.title.message}</p>
-                )}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Description</label>
-                <textarea
-                  {...register('description')}
-                  rows={3}
-                  className="mt-1 w-full rounded-lg border border-gray-300 p-2 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500"
-                />
-                {errors.description && (
-                  <p className="mt-1 text-sm text-red-500">{errors.description.message}</p>
-                )}
-              </div>
+    <div className="relative min-h-screen bg-white">
+      <GridBackground />
+      <div className="container relative z-10 mx-auto px-4 py-8">
+        <div className="min-h-screen bg-gray-50 py-12">
+          <div className="container mx-auto max-w-3xl px-4">
+            <div className="mb-8 flex items-center gap-4">
+              <button
+                onClick={() => router.back()}
+                className="flex items-center gap-2 text-gray-600 hover:text-orange-500"
+              >
+                <ArrowLeft className="h-5 w-5" />
+                Back
+              </button>
+              <h1 className="text-3xl font-bold text-gray-900">Edit Recipe</h1>
             </div>
 
-            {/* Ingredients */}
-            <div>
-              <div className="mb-2 flex items-center justify-between">
-                <label className="text-sm font-medium text-gray-700">Ingredients</label>
-                <button
-                  type="button"
-                  onClick={addIngredient}
-                  className="text-sm text-orange-500 hover:text-orange-600"
-                >
-                  + Add Ingredient
-                </button>
-              </div>
-              {ingredients.map((_, index) => (
-                <div key={index} className="mb-2 flex gap-2">
-                  <input
-                    type="text"
-                    placeholder="Name"
-                    {...register(`ingredients.${index}.name`)}
-                    className="w-full rounded-lg border border-gray-300 p-2"
-                  />
-                  <input
-                    type="number"
-                    placeholder="Amount"
-                    {...register(`ingredients.${index}.amount`)}
-                    className="w-24 rounded-lg border border-gray-300 p-2"
-                  />
-                  <input
-                    type="text"
-                    placeholder="Unit"
-                    {...register(`ingredients.${index}.unit`)}
-                    className="w-24 rounded-lg border border-gray-300 p-2"
-                  />
-                  {index > 0 && (
+            <div className="rounded-xl bg-white p-8 shadow-sm">
+              <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+                {/* Basic Information */}
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Title</label>
+                    <input
+                      type="text"
+                      {...register('title')}
+                      className="mt-1 w-full rounded-lg border border-gray-300 p-2 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500"
+                    />
+                    {errors.title && (
+                      <p className="mt-1 text-sm text-red-500">{errors.title.message}</p>
+                    )}
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Description</label>
+                    <textarea
+                      {...register('description')}
+                      rows={3}
+                      className="mt-1 w-full rounded-lg border border-gray-300 p-2 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500"
+                    />
+                    {errors.description && (
+                      <p className="mt-1 text-sm text-red-500">{errors.description.message}</p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Ingredients */}
+                <div>
+                  <div className="mb-2 flex items-center justify-between">
+                    <label className="text-sm font-medium text-gray-700">Ingredients</label>
                     <button
                       type="button"
-                      onClick={() => removeIngredient(index)}
-                      className="text-red-500 hover:text-red-600"
+                      onClick={addIngredient}
+                      className="text-sm text-orange-500 hover:text-orange-600"
                     >
-                      ×
+                      + Add Ingredient
                     </button>
-                  )}
+                  </div>
+                  {ingredients.map((_, index) => (
+                    <div key={index} className="mb-2 flex gap-2">
+                      <input
+                        type="text"
+                        placeholder="Name"
+                        {...register(`ingredients.${index}.name`)}
+                        className="w-full rounded-lg border border-gray-300 p-2"
+                      />
+                      <input
+                        type="number"
+                        placeholder="Amount"
+                        {...register(`ingredients.${index}.amount`)}
+                        className="w-24 rounded-lg border border-gray-300 p-2"
+                      />
+                      <input
+                        type="text"
+                        placeholder="Unit"
+                        {...register(`ingredients.${index}.unit`)}
+                        className="w-24 rounded-lg border border-gray-300 p-2"
+                      />
+                      {index > 0 && (
+                        <button
+                          type="button"
+                          onClick={() => removeIngredient(index)}
+                          className="text-red-500 hover:text-red-600"
+                        >
+                          ×
+                        </button>
+                      )}
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
 
-            {/* Instructions */}
-            <div>
-              <div className="mb-2 flex items-center justify-between">
-                <label className="text-sm font-medium text-gray-700">Instructions</label>
-                <button
-                  type="button"
-                  onClick={addInstruction}
-                  className="text-sm text-orange-500 hover:text-orange-600"
-                >
-                  + Add Step
-                </button>
-              </div>
-              {instructions.map((_, index) => (
-                <div key={index} className="mb-2 flex gap-2">
-                  <span className="mt-2 text-gray-500">#{index + 1}</span>
-                  <input
-                    type="text"
-                    {...register(`instructions.${index}`)}
-                    className="w-full rounded-lg border border-gray-300 p-2"
-                  />
-                  {index > 0 && (
+                {/* Instructions */}
+                <div>
+                  <div className="mb-2 flex items-center justify-between">
+                    <label className="text-sm font-medium text-gray-700">Instructions</label>
                     <button
                       type="button"
-                      onClick={() => removeInstruction(index)}
-                      className="text-red-500 hover:text-red-600"
+                      onClick={addInstruction}
+                      className="text-sm text-orange-500 hover:text-orange-600"
                     >
-                      ×
+                      + Add Step
                     </button>
-                  )}
+                  </div>
+                  {instructions.map((_, index) => (
+                    <div key={index} className="mb-2 flex gap-2">
+                      <span className="mt-2 text-gray-500">#{index + 1}</span>
+                      <input
+                        type="text"
+                        {...register(`instructions.${index}`)}
+                        className="w-full rounded-lg border border-gray-300 p-2"
+                      />
+                      {index > 0 && (
+                        <button
+                          type="button"
+                          onClick={() => removeInstruction(index)}
+                          className="text-red-500 hover:text-red-600"
+                        >
+                          ×
+                        </button>
+                      )}
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
 
-            {/* Additional Details */}
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Cooking Time (minutes)</label>
-                <input
-                  type="number"
-                  {...register('cookingTime')}
-                  className="mt-1 w-full rounded-lg border border-gray-300 p-2"
-                />
-              </div>
+                {/* Additional Details */}
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Cooking Time (minutes)</label>
+                    <input
+                      type="number"
+                      {...register('cookingTime')}
+                      className="mt-1 w-full rounded-lg border border-gray-300 p-2"
+                    />
+                  </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Servings</label>
-                <input
-                  type="number"
-                  {...register('servings')}
-                  className="mt-1 w-full rounded-lg border border-gray-300 p-2"
-                />
-              </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Servings</label>
+                    <input
+                      type="number"
+                      {...register('servings')}
+                      className="mt-1 w-full rounded-lg border border-gray-300 p-2"
+                    />
+                  </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Difficulty</label>
-                <select
-                  {...register('difficulty')}
-                  className="mt-1 w-full rounded-lg border border-gray-300 p-2"
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Difficulty</label>
+                    <select
+                      {...register('difficulty')}
+                      className="mt-1 w-full rounded-lg border border-gray-300 p-2"
+                    >
+                      <option value="easy">Easy</option>
+                      <option value="medium">Medium</option>
+                      <option value="hard">Hard</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Cuisine</label>
+                    <input
+                      type="text"
+                      {...register('cuisine')}
+                      className="mt-1 w-full rounded-lg border border-gray-300 p-2"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Author</label>
+                    <input
+                      type="text"
+                      {...register('author')}
+                      className="mt-1 w-full rounded-lg border border-gray-300 p-2"
+                    />
+                  </div>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="flex w-full items-center justify-center rounded-lg bg-orange-500 px-4 py-3 font-semibold text-white transition-colors hover:bg-orange-600 disabled:bg-orange-300"
                 >
-                  <option value="easy">Easy</option>
-                  <option value="medium">Medium</option>
-                  <option value="hard">Hard</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Cuisine</label>
-                <input
-                  type="text"
-                  {...register('cuisine')}
-                  className="mt-1 w-full rounded-lg border border-gray-300 p-2"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Author</label>
-                <input
-                  type="text"
-                  {...register('author')}
-                  className="mt-1 w-full rounded-lg border border-gray-300 p-2"
-                />
-              </div>
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Updating Recipe...
+                    </>
+                  ) : (
+                    'Update Recipe'
+                  )}
+                </button>
+              </form>
             </div>
-
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="flex w-full items-center justify-center rounded-lg bg-orange-500 px-4 py-3 font-semibold text-white transition-colors hover:bg-orange-600 disabled:bg-orange-300"
-            >
-              {isSubmitting ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Updating Recipe...
-                </>
-              ) : (
-                'Update Recipe'
-              )}
-            </button>
-          </form>
+          </div>
         </div>
       </div>
     </div>

@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import axios from 'axios';
 import { Search, Plus, Clock, ChefHat, Globe } from 'lucide-react';
+import { GridBackground } from '@/components/ui/grid-background';
 
 interface Recipe {
   _id: string;
@@ -40,8 +41,9 @@ export default function RecipesPage() {
   );
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="container mx-auto px-4 py-12">
+    <div className="relative min-h-screen bg-white">
+      <GridBackground />
+      <div className="container relative z-10 mx-auto px-4 py-8">
         <div className="mb-12 flex flex-col justify-between gap-6 sm:flex-row sm:items-center">
           <h1 className="text-4xl font-bold text-gray-900">Recipes</h1>
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
