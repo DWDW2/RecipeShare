@@ -42,7 +42,7 @@ export default function RecipesPage() {
   );
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen">
       <div className="container mx-auto px-4 py-12">
         <div className="mb-12 flex flex-col justify-between gap-6 sm:flex-row sm:items-center">
           <h1 className="text-4xl font-bold text-gray-900">Recipes</h1>
@@ -52,7 +52,7 @@ export default function RecipesPage() {
               <input
                 type="text"
                 placeholder="Search recipes..."
-                className="w-full rounded-xl border border-gray-200 bg-white py-3 pl-10 pr-4 shadow-sm focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500"
+                className="w-full rounded-xl border border-gray-200 bg-white/80 backdrop-blur-sm py-3 pl-10 pr-4 shadow-sm focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
@@ -77,7 +77,7 @@ export default function RecipesPage() {
               <Link
                 key={recipe._id}
                 href={`/recipes/${recipe._id}`}
-                className="group rounded-xl border border-gray-100 bg-white p-6 shadow-sm transition-all hover:shadow-md"
+                className="group rounded-xl border border-orange-100 bg-white/80 backdrop-blur-sm p-6 shadow-sm transition-all hover:shadow-md"
               >
                 <h2 className="mb-3 text-xl font-semibold text-gray-900 group-hover:text-orange-500">
                   {recipe.title}
@@ -105,7 +105,7 @@ export default function RecipesPage() {
         )}
 
         {!isLoading && filteredRecipes.length === 0 && (
-          <div className="flex h-[60vh] flex-col items-center justify-center rounded-xl bg-white p-8 text-center shadow-sm">
+          <div className="flex h-[60vh] flex-col items-center justify-center rounded-xl bg-white/80 backdrop-blur-sm p-8 text-center shadow-sm">
             <p className="mb-4 text-2xl font-semibold text-gray-900">
               No recipes found
             </p>
