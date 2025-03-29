@@ -28,13 +28,19 @@ export default function RootLayout({
                 href="/recipes"
                 className="text-gray-600 transition-colors hover:text-orange-500"
               >
-                Recipes
+                Рецепты
+              </Link>
+              <Link
+                href="/restaurants"
+                className="text-gray-600 transition-colors hover:text-orange-500"
+              >
+                Рестораны
               </Link>
               <Link
                 href="/recipes/new"
                 className="rounded-full bg-orange-500 px-4 py-2 text-white transition-colors hover:bg-orange-600"
               >
-                Share Recipe
+                Поделиться рецептом
               </Link>
             </div>
           </div>
