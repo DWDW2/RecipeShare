@@ -129,37 +129,53 @@ export default function NewRecipePage({}) {
     setInstructions(instructions.filter((_, i) => i !== index));
   };
 
-  const startRecording = async () => {
+  const startRecording = () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const mediaRecorder = new MediaRecorder(stream);
-      mediaRecorderRef.current = mediaRecorder;
-      audioChunksRef.current = [];
+      const SpeechRecognition =
+        window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRecognition) {
+        throw new Error("Speech recognition not supported");
+      }
 
-      mediaRecorder.addEventListener("dataavailable", (event) => {
-        audioChunksRef.current.push(event.data);
-      });
+      const recognition = new SpeechRecognition();
+      recognition.lang = "en-US";
+      recognition.continuous = true;
+      recognition.interimResults = true;
 
-      mediaRecorder.addEventListener("stop", () => {
-        const audioBlob = new Blob(audioChunksRef.current, {
-          type: "audio/wav",
-        });
-        transcribeAudio(audioBlob);
+      recognition.onresult = (event: SpeechRecognitionEvent) => {
+        const currentTranscript = Array.from(event.results)
+          .map((result: SpeechRecognitionResult) => result[0].transcript)
+          .join("");
 
-        stream.getTracks().forEach((track) => track.stop());
-      });
+        setTranscript(currentTranscript);
+        handleInputChange({
+          target: { value: currentTranscript },
+        } as React.ChangeEvent<HTMLTextAreaElement>);
+      };
 
-      mediaRecorder.start();
+      recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
+        console.error("Speech recognition error:", event.error);
+        setIsRecording(false);
+      };
+
+      recognition.onend = () => {
+        setIsRecording(false);
+      };
+
+      recognition.start();
       setIsRecording(true);
     } catch (error) {
-      console.error("Error accessing microphone:", error);
-      alert("Could not access your microphone. Please check permissions.");
+      console.error("Error starting speech recognition:", error);
+      alert("Speech recognition is not supported in your browser.");
     }
   };
 
   const stopRecording = () => {
-    if (mediaRecorderRef.current && isRecording) {
-      mediaRecorderRef.current.stop();
+    const SpeechRecognition =
+      window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (SpeechRecognition) {
+      const recognition = new SpeechRecognition();
+      recognition.stop();
       setIsRecording(false);
     }
   };
@@ -214,7 +230,7 @@ export default function NewRecipePage({}) {
         </TabsList>
       </div>
 
-      <TabsContent value="AI Recipe" className="mt-6 px-4">
+      <TabsContent value="AI Recipe" className="mt-6 px-4 min-h-screen">
         <Card className="max-w-3xl mx-auto">
           <CardHeader>
             <CardTitle>Generate Recipe with AI</CardTitle>
@@ -481,6 +497,23 @@ export default function NewRecipePage({}) {
                   className="mt-1 w-full rounded-lg border border-gray-300 p-2"
                 />
               </div>
+            </div>
+
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={startRecording}
+                className="bg-blue-500 text-white px-4 py-2 rounded"
+              >
+                Start Recording
+              </button>
+              <button
+                type="button"
+                onClick={stopRecording}
+                className="bg-red-500 text-white px-4 py-2 rounded"
+              >
+                Stop Recording
+              </button>
             </div>
 
             <button

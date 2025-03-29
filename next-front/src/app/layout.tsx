@@ -1,13 +1,15 @@
-import './globals.css';
-import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
-import Link from 'next/link';
+import { GridBackground } from "@/components/ui/grid-layout";
+import "./globals.css";
+import type { Metadata } from "next";
+import { Inter } from "next/font/google";
+import Link from "next/link";
 
-const inter = Inter({ subsets: ['latin'] });
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: 'Recipe Sharing Platform',
-  description: 'Share and discover amazing recipes from food lovers around the world',
+  title: "Recipe Sharing Platform",
+  description:
+    "Share and discover amazing recipes from food lovers around the world",
 };
 
 export default function RootLayout({
@@ -18,6 +20,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
+        {/* <GridBackground />/ */}
         <nav className="border-b border-gray-200 bg-white">
           <div className="container mx-auto flex items-center justify-between px-4 py-4">
             <Link href="/" className="text-xl font-bold text-orange-500">
