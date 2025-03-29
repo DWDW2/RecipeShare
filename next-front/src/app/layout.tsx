@@ -3,6 +3,7 @@ import "./globals.css";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import Link from "next/link";
+import { cn } from "@/lib/utils";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -19,9 +20,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={inter.className}>
-        {/* <GridBackground />/ */}
-        <nav className="border-b border-gray-200 bg-white">
+      <body className={cn(inter.className, "min-h-screen bg-white")}>
+        <GridBackground />
+        <nav className="border-b border-gray-200 bg-white/80 backdrop-blur-sm">
           <div className="container mx-auto flex items-center justify-between px-4 py-4">
             <Link href="/" className="text-xl font-bold text-orange-500">
               RecipeShare
@@ -48,8 +49,8 @@ export default function RootLayout({
             </div>
           </div>
         </nav>
-        <main>{children}</main>
-        <footer className="border-t border-gray-200 bg-white py-8 bottom-0">
+        <main className="relative z-10">{children}</main>
+        <footer className="border-t border-gray-200 bg-white/80 backdrop-blur-sm py-8">
           <div className="container mx-auto px-4 text-center text-gray-600">
             <p>© 2024 RecipeShare. All rights reserved.</p>
           </div>
