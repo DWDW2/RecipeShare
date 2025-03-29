@@ -1,22 +1,22 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import Link from 'next/link';
-import axios from 'axios';
-import { Search, Plus, Clock, ChefHat, Globe } from 'lucide-react';
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import axios from "axios";
+import { Search, Plus, Clock, ChefHat, Globe } from "lucide-react";
 
 interface Recipe {
   _id: string;
   title: string;
   description: string;
   cookingTime: number;
-  difficulty: 'easy' | 'medium' | 'hard';
+  difficulty: "easy" | "medium" | "hard";
   cuisine: string;
 }
 
 export default function RecipesPage() {
   const [recipes, setRecipes] = useState<Recipe[]>([]);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -25,11 +25,13 @@ export default function RecipesPage() {
 
   const fetchRecipes = async () => {
     try {
-      console.log(process.env.NEXT_PUBLIC_API_URL)
-      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/recipes`);
+      console.log(process.env.NEXT_PUBLIC_API_URL);
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_API_URL}/recipes`
+      );
       setRecipes(response.data.data);
     } catch (error) {
-      console.error('Error fetching recipes:', error);
+      console.error("Error fetching recipes:", error);
     } finally {
       setIsLoading(false);
     }
@@ -80,7 +82,9 @@ export default function RecipesPage() {
                 <h2 className="mb-3 text-xl font-semibold text-gray-900 group-hover:text-orange-500">
                   {recipe.title}
                 </h2>
-                <p className="mb-6 text-gray-600 line-clamp-2">{recipe.description}</p>
+                <p className="mb-6 text-gray-600 line-clamp-2">
+                  {recipe.description}
+                </p>
                 <div className="flex items-center gap-6 text-sm text-gray-500">
                   <span className="flex items-center gap-1">
                     <Clock className="h-4 w-4 text-orange-500" />
@@ -102,15 +106,17 @@ export default function RecipesPage() {
 
         {!isLoading && filteredRecipes.length === 0 && (
           <div className="flex h-[60vh] flex-col items-center justify-center rounded-xl bg-white p-8 text-center shadow-sm">
-            <p className="mb-4 text-2xl font-semibold text-gray-900">No recipes found</p>
+            <p className="mb-4 text-2xl font-semibold text-gray-900">
+              No recipes found
+            </p>
             <p className="text-lg text-gray-600">
               {searchQuery
-                ? 'Try adjusting your search query'
-                : 'Start by adding your first recipe!'}
+                ? "Try adjusting your search query"
+                : "Start by adding your first recipe!"}
             </p>
           </div>
         )}
       </div>
     </div>
   );
-} 
+}

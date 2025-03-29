@@ -1,41 +1,53 @@
-'use client';
+"use client";
 
-import { useState, useEffect, use } from 'react';
-import { useRouter } from 'next/navigation';
-import axios from 'axios';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
-import { Loader2, ArrowLeft } from 'lucide-react';
-import { API_ENDPOINTS } from '@/config/api';
+import { useState, useEffect, use } from "react";
+import { useRouter } from "next/navigation";
+import axios from "axios";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { Loader2, ArrowLeft } from "lucide-react";
+import { API_ENDPOINTS } from "@/config/api";
 
 const recipeSchema = z.object({
-  title: z.string().min(1, 'Title is required').max(100),
-  description: z.string().min(1, 'Description is required').max(500),
-  ingredients: z.array(
-    z.object({
-      name: z.string().min(1, 'Ingredient name is required'),
-      amount: z.coerce.number().min(0, 'Amount must be positive'),
-      unit: z.string().min(1, 'Unit is required'),
-    })
-  ).min(1, 'At least one ingredient is required'),
-  instructions: z.array(z.string().min(1, 'Instruction is required')).min(1, 'At least one instruction is required'),
-  cookingTime: z.coerce.number().min(1, 'Cooking time must be at least 1 minute'),
-  servings: z.coerce.number().min(1, 'At least one serving is required'),
-  difficulty: z.enum(['easy', 'medium', 'hard']),
-  cuisine: z.string().min(1, 'Cuisine type is required'),
-  author: z.string().min(1, 'Author name is required'),
+  title: z.string().min(1, "Title is required").max(100),
+  description: z.string().min(1, "Description is required").max(500),
+  ingredients: z
+    .array(
+      z.object({
+        name: z.string().min(1, "Ingredient name is required"),
+        amount: z.coerce.number().min(0, "Amount must be positive"),
+        unit: z.string().min(1, "Unit is required"),
+      })
+    )
+    .min(1, "At least one ingredient is required"),
+  instructions: z
+    .array(z.string().min(1, "Instruction is required"))
+    .min(1, "At least one instruction is required"),
+  cookingTime: z.coerce
+    .number()
+    .min(1, "Cooking time must be at least 1 minute"),
+  servings: z.coerce.number().min(1, "At least one serving is required"),
+  difficulty: z.enum(["easy", "medium", "hard"]),
+  cuisine: z.string().min(1, "Cuisine type is required"),
+  author: z.string().min(1, "Author name is required"),
 });
 
 type RecipeFormData = z.infer<typeof recipeSchema>;
 
-export default function EditRecipePage({ params }: { params: Promise<{ id: string }> }) {
+export default function EditRecipePage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [ingredients, setIngredients] = useState([{ name: '', amount: '', unit: '' }]);
-  const [instructions, setInstructions] = useState(['']);
-  const {id} = use(params)
+  const [ingredients, setIngredients] = useState([
+    { name: "", amount: "", unit: "" },
+  ]);
+  const [instructions, setInstructions] = useState([""]);
+  const { id } = use(params);
   const {
     register,
     handleSubmit,
@@ -53,11 +65,10 @@ export default function EditRecipePage({ params }: { params: Promise<{ id: strin
     try {
       const response = await axios.get(API_ENDPOINTS.recipes.detail(id));
       const recipe = response.data.data;
-      
-      // Pre-fill the form with existing data
+
       reset({
         ...recipe,
-        ingredients: recipe.ingredients.map(ing => ({
+        ingredients: recipe.ingredients.map((ing) => ({
           ...ing,
           amount: Number(ing.amount),
         })),
@@ -66,8 +77,8 @@ export default function EditRecipePage({ params }: { params: Promise<{ id: strin
       setIngredients(recipe.ingredients);
       setInstructions(recipe.instructions);
     } catch (error) {
-      console.error('Error fetching recipe:', error);
-      router.push('/recipes');
+      console.error("Error fetching recipe:", error);
+      router.push("/recipes");
     } finally {
       setIsLoading(false);
     }
@@ -78,7 +89,7 @@ export default function EditRecipePage({ params }: { params: Promise<{ id: strin
     try {
       const transformedData = {
         ...data,
-        ingredients: data.ingredients.map(ing => ({
+        ingredients: data.ingredients.map((ing) => ({
           ...ing,
           amount: Number(ing.amount),
         })),
@@ -89,15 +100,15 @@ export default function EditRecipePage({ params }: { params: Promise<{ id: strin
       await axios.put(API_ENDPOINTS.recipes.update(id), transformedData);
       router.push(`/recipes/${id}`);
     } catch (error) {
-      console.error('Error updating recipe:', error);
-      alert('Failed to update recipe. Please try again.');
+      console.error("Error updating recipe:", error);
+      alert("Failed to update recipe. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
   };
 
   const addIngredient = () => {
-    setIngredients([...ingredients, { name: '', amount: '', unit: '' }]);
+    setIngredients([...ingredients, { name: "", amount: "", unit: "" }]);
   };
 
   const removeIngredient = (index: number) => {
@@ -105,7 +116,7 @@ export default function EditRecipePage({ params }: { params: Promise<{ id: strin
   };
 
   const addInstruction = () => {
-    setInstructions([...instructions, '']);
+    setInstructions([...instructions, ""]);
   };
 
   const removeInstruction = (index: number) => {
@@ -139,26 +150,34 @@ export default function EditRecipePage({ params }: { params: Promise<{ id: strin
             {/* Basic Information */}
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700">Title</label>
+                <label className="block text-sm font-medium text-gray-700">
+                  Title
+                </label>
                 <input
                   type="text"
-                  {...register('title')}
+                  {...register("title")}
                   className="mt-1 w-full rounded-lg border border-gray-300 p-2 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500"
                 />
                 {errors.title && (
-                  <p className="mt-1 text-sm text-red-500">{errors.title.message}</p>
+                  <p className="mt-1 text-sm text-red-500">
+                    {errors.title.message}
+                  </p>
                 )}
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700">Description</label>
+                <label className="block text-sm font-medium text-gray-700">
+                  Description
+                </label>
                 <textarea
-                  {...register('description')}
+                  {...register("description")}
                   rows={3}
                   className="mt-1 w-full rounded-lg border border-gray-300 p-2 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500"
                 />
                 {errors.description && (
-                  <p className="mt-1 text-sm text-red-500">{errors.description.message}</p>
+                  <p className="mt-1 text-sm text-red-500">
+                    {errors.description.message}
+                  </p>
                 )}
               </div>
             </div>
@@ -166,7 +185,9 @@ export default function EditRecipePage({ params }: { params: Promise<{ id: strin
             {/* Ingredients */}
             <div>
               <div className="mb-2 flex items-center justify-between">
-                <label className="text-sm font-medium text-gray-700">Ingredients</label>
+                <label className="text-sm font-medium text-gray-700">
+                  Ingredients
+                </label>
                 <button
                   type="button"
                   onClick={addIngredient}
@@ -211,7 +232,9 @@ export default function EditRecipePage({ params }: { params: Promise<{ id: strin
             {/* Instructions */}
             <div>
               <div className="mb-2 flex items-center justify-between">
-                <label className="text-sm font-medium text-gray-700">Instructions</label>
+                <label className="text-sm font-medium text-gray-700">
+                  Instructions
+                </label>
                 <button
                   type="button"
                   onClick={addInstruction}
@@ -244,27 +267,33 @@ export default function EditRecipePage({ params }: { params: Promise<{ id: strin
             {/* Additional Details */}
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div>
-                <label className="block text-sm font-medium text-gray-700">Cooking Time (minutes)</label>
+                <label className="block text-sm font-medium text-gray-700">
+                  Cooking Time (minutes)
+                </label>
                 <input
                   type="number"
-                  {...register('cookingTime')}
+                  {...register("cookingTime")}
                   className="mt-1 w-full rounded-lg border border-gray-300 p-2"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700">Servings</label>
+                <label className="block text-sm font-medium text-gray-700">
+                  Servings
+                </label>
                 <input
                   type="number"
-                  {...register('servings')}
+                  {...register("servings")}
                   className="mt-1 w-full rounded-lg border border-gray-300 p-2"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700">Difficulty</label>
+                <label className="block text-sm font-medium text-gray-700">
+                  Difficulty
+                </label>
                 <select
-                  {...register('difficulty')}
+                  {...register("difficulty")}
                   className="mt-1 w-full rounded-lg border border-gray-300 p-2"
                 >
                   <option value="easy">Easy</option>
@@ -274,19 +303,23 @@ export default function EditRecipePage({ params }: { params: Promise<{ id: strin
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700">Cuisine</label>
+                <label className="block text-sm font-medium text-gray-700">
+                  Cuisine
+                </label>
                 <input
                   type="text"
-                  {...register('cuisine')}
+                  {...register("cuisine")}
                   className="mt-1 w-full rounded-lg border border-gray-300 p-2"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700">Author</label>
+                <label className="block text-sm font-medium text-gray-700">
+                  Author
+                </label>
                 <input
                   type="text"
-                  {...register('author')}
+                  {...register("author")}
                   className="mt-1 w-full rounded-lg border border-gray-300 p-2"
                 />
               </div>
@@ -303,7 +336,7 @@ export default function EditRecipePage({ params }: { params: Promise<{ id: strin
                   Updating Recipe...
                 </>
               ) : (
-                'Update Recipe'
+                "Update Recipe"
               )}
             </button>
           </form>
@@ -311,4 +344,4 @@ export default function EditRecipePage({ params }: { params: Promise<{ id: strin
       </div>
     </div>
   );
-} 
+}
