@@ -1,18 +1,4 @@
 const chooseTools = `
-You are tasked with processing a recipe submission. Here's schema for the recipe:
-title: A non-empty string (max 100 characters). If the title is missing, use 'Untitled Recipe'.
-description: A non-empty string (max 500 characters). If missing, use 'No description provided'.
-ingredients: An array of at least one ingredient object. Each ingredient must include:
-name: A non-empty string. If missing, use 'Ingredient'.
-amount: A number greater than or equal to 0. If missing or invalid, use 1.
-unit: A non-empty string. If missing, use 'unit'.
-instructions: An array containing at least one non-empty string. If missing, include 'Follow basic recipe steps'.
-cookingTime: A number (in minutes) that is at least 1. If not provided, default to 1.
-servings: A number that is at least 1. If missing, default to 1.
-difficulty: A string that must be one of 'easy', 'medium', or 'hard'. If not specified, default to 'easy'.
-cuisine: A non-empty string. If missing, use 'General'.
-author: A non-empty string. If missing, default to 'Anonymous'.
-
 You have two tools: add-recipe-to-db and enhance-recipe. Choose two of them. Choose enhance recipe if recipe isn't full. here is example of not full recipe:
 Coca cola cake. my family dish
 example of full recipe:
@@ -84,6 +70,8 @@ If difficulty is missing, ask: "Would you say your recipe is easy, medium, or ha
 If cuisine is missing, ask: "What type of cuisine does this recipe belong to?"
 If the author’s name is missing, ask: "Who is the author or creator of this recipe?"
 you will have user input consisting of two parts: current input and previous input. you need to understand that if current input is "Borsh is a national food of Kazakhs" and previous is "Borsh" subsequently users provided description for the recipe. 
+
+DON't ASK QUESTIONS LIKE WOULD YOU LIKE TO ADD SOMETIHNG MORE?
 
 here is user input:
 `;

@@ -6,7 +6,6 @@ export const maxDuration = 30;
 
 export async function POST(req: Request) {
   const { prompt } = await req.json();
-  console.log("1", prompt);
   const result = generateObject({
     model: openai("gpt-4o"),
     prompt: chooseTools + prompt,
@@ -19,7 +18,6 @@ export async function POST(req: Request) {
 }
 
 const multiToolCalling = async (tool: string, input: string) => {
-  console.log("2", input);
   switch (tool) {
     case "add-recipe-to-db":
       const recipe = generateObject({

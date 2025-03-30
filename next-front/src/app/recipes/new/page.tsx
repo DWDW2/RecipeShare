@@ -337,7 +337,7 @@ export default function NewRecipePage() {
               <Button
                 onClick={handlePhotoUpload}
                 disabled={!photoPreview || isUploadingPhoto}
-                className="w-full"
+                className="w-full bg-orange-500 hover:bg-orange-500/70"
               >
                 {isUploadingPhoto ? (
                   <>
@@ -408,7 +408,7 @@ export default function NewRecipePage() {
 
               <Button
                 type="submit"
-                className="w-full"
+                className="w-full bg-orange-500 hover:bg-orange-500/70"
                 disabled={isAiLoading || isProcessingAi || !input.trim()}
               >
                 {isAiLoading || isProcessingAi ? (
@@ -439,12 +439,12 @@ export default function NewRecipePage() {
             )}
 
             {completion && (
-              <div className="mt-6 p-4 bg-gray-50 rounded-lg w-fit">
+              <div className="mt-6 p-4 bg-gray-50 rounded-lg ">
                 <h3 className="text-lg font-semibold mb-2">
                   Generated Recipe:
                 </h3>
                 <div className="prose prose-sm">
-                  <pre className="text-sm whitespace-pre-wrap">
+                  <pre className="text-sm whitespace-pre-wrap overflow-scroll">
                     {completion}
                   </pre>
                 </div>
