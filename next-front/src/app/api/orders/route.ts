@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
 
-// Временное хранилище заказов (в реальном приложении здесь будет база данных)
 let orders = [
   {
     id: '1',
@@ -39,7 +38,6 @@ export async function POST(request: Request) {
   try {
     const order = await request.json();
 
-    // В реальном приложении здесь будет сохранение в базу данных
     const newOrder = {
       id: Date.now().toString(),
       ...order,

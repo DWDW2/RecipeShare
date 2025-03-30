@@ -10,7 +10,6 @@ const oauth2Client = new OAuth2Client(
 
 export async function GET() {
   try {
-    // Генерируем URL для авторизации
     const authUrl = oauth2Client.generateAuthUrl({
       access_type: 'offline',
       scope: ['https://www.googleapis.com/auth/calendar']
@@ -30,10 +29,8 @@ export async function POST(request: Request) {
   try {
     const { code } = await request.json();
 
-    // Получаем токены с помощью кода авторизации
     const { tokens } = await oauth2Client.getToken(code);
 
-    // Устанавливаем токены
     oauth2Client.setCredentials(tokens);
 
     return NextResponse.json({
