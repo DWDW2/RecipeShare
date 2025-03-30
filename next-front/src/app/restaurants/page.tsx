@@ -3,6 +3,8 @@
 import { useState, useCallback } from 'react';
 import { GoogleMap, useJsApiLoader, Marker, InfoWindow, Circle } from '@react-google-maps/api';
 import { Clock, Navigation, Star, Phone, MapPin } from 'lucide-react';
+import { BookingForm } from "@/components/booking-form";
+import { OrdersList } from "@/components/orders-list";
 
 const containerStyle = {
   width: '100%',
@@ -243,6 +245,7 @@ export default function RestaurantsPage() {
               )}
             </GoogleMap>
           </div>
+          <BookingForm selectedRestaurant={selectedRestaurant} />
         </div>
 
         <div className="space-y-6">
@@ -285,6 +288,11 @@ export default function RestaurantsPage() {
                 </div>
               ))}
             </div>
+          </div>
+
+          <div className="bg-white rounded-xl p-4 shadow-lg">
+            <h2 className="text-xl font-semibold mb-4">Мои заказы</h2>
+            <OrdersList />
           </div>
         </div>
       </div>
