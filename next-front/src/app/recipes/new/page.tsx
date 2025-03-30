@@ -1,12 +1,20 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Loader2, Mic, MicOff, Send } from "lucide-react";
+import {
+  Loader2,
+  Mic,
+  MicOff,
+  Send,
+  Upload,
+  Camera,
+  Image,
+} from "lucide-react";
 import { API_ENDPOINTS } from "@/config/api";
 import { Tabs, TabsList, TabsContent, TabsTrigger } from "@/components/ui/tabs";
 import { useCompletion } from "@ai-sdk/react";
@@ -21,6 +29,14 @@ import {
   CardDescription,
   CardFooter,
 } from "@/components/ui/card";
+
+// Declare the SpeechRecognition types for TypeScript
+declare global {
+  interface Window {
+    SpeechRecognition: any;
+    webkitSpeechRecognition: any;
+  }
+}
 
 const recipeSchema = z.object({
   title: z.string().min(1, "Title is required").max(100),
@@ -48,7 +64,7 @@ const recipeSchema = z.object({
 
 type RecipeFormData = z.infer<typeof recipeSchema>;
 
-export default function NewRecipePage({}) {
+export default function NewRecipePage() {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [ingredients, setIngredients] = useState([
@@ -59,6 +75,12 @@ export default function NewRecipePage({}) {
   const [transcript, setTranscript] = useState("");
   const [isProcessingAi, setIsProcessingAi] = useState(false);
   const [previous, setPrevious] = useState<string>("");
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
+  const [photoResponse, setPhotoResponse] = useState<string>("");
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const recognitionRef = useRef<any>(null);
+
   const {
     completion,
     input,
@@ -159,6 +181,7 @@ export default function NewRecipePage({}) {
       };
 
       recognition.start();
+      recognitionRef.current = recognition;
       setIsRecording(true);
     } catch (error) {
       console.error("Error starting speech recognition:", error);
@@ -167,48 +190,82 @@ export default function NewRecipePage({}) {
   };
 
   const stopRecording = () => {
-    const SpeechRecognition =
-      window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (SpeechRecognition) {
-      const recognition = new SpeechRecognition();
-      recognition.stop();
-      setIsRecording(false);
+    if (recognitionRef.current) {
+      try {
+        recognitionRef.current.stop();
+      } catch (e) {
+        console.error("Error stopping recognition:", e);
+      }
     }
+    setIsRecording(false);
   };
 
-  const transcribeAudio = async (audioBlob: Blob) => {
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      if (event.target?.result) {
+        setPhotoPreview(event.target.result as string);
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handlePhotoUpload = async () => {
+    if (!fileInputRef.current?.files?.[0]) {
+      alert("Please select a photo");
+      return;
+    }
+
+    const file = fileInputRef.current.files[0];
+    setIsUploadingPhoto(true);
+    setPhotoResponse("");
+
     try {
       const formData = new FormData();
-      formData.append("audio", audioBlob);
+      formData.append("photo", file);
 
-      const speechRecognition = new (window.SpeechRecognition ||
-        window.webkitSpeechRecognition)();
-      speechRecognition.lang = "en-US";
-      speechRecognition.continuous = true;
-      speechRecognition.interimResults = true;
+      const response = await fetch("/api/ai-photo", {
+        method: "POST",
+        body: formData,
+      });
 
-      speechRecognition.onresult = (event) => {
-        const currentTranscript = Array.from(event.results)
-          .map((result) => result[0].transcript)
-          .join("");
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
 
-        setTranscript(currentTranscript);
-        handleInputChange({
-          target: { value: currentTranscript },
-        } as React.ChangeEvent<HTMLTextAreaElement>);
-      };
+      const data = await response.json();
 
-      speechRecognition.start();
+      if (data && data.content) {
+        try {
+          const jsonContent = JSON.parse(data.content);
+          const formatted = JSON.stringify(jsonContent, null, 2);
+          setPhotoResponse(formatted);
+        } catch (e) {
+          setPhotoResponse(data.content);
+        }
+      } else {
+        setPhotoResponse(JSON.stringify(data, null, 2));
+      }
     } catch (error) {
-      console.error("Error transcribing audio:", error);
-      alert("Failed to transcribe audio. Please try again.");
+      console.error("Error uploading photo:", error);
+      alert("Failed to generate recipe from photo. Please try again.");
+    } finally {
+      setIsUploadingPhoto(false);
     }
   };
+  useEffect(() => {
+    photoResponse && complete(photoResponse);
+  }, [photoResponse]);
+  const triggerFileInput = () => {
+    fileInputRef.current?.click();
+  };
+
   const handleManualSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log(input);
     if (input.trim()) {
-      console.log(input);
       complete("current-input" + input + "previous input" + previous);
       setPrevious(input);
     }
@@ -217,15 +274,103 @@ export default function NewRecipePage({}) {
   return (
     <Tabs defaultValue="Add Recipe" className="w-full">
       <div className="w-full flex items-center justify-center">
-        <TabsList className="mt-5 w-[300px]">
+        <TabsList className="mt-5 w-[400px]">
           <TabsTrigger className="flex-1" value="Add Recipe">
             Add recipe
           </TabsTrigger>
           <TabsTrigger className="flex-1" value="AI Recipe">
             AI recipe
           </TabsTrigger>
+          <TabsTrigger className="flex-1" value="Photo Recipe">
+            From photo
+          </TabsTrigger>
         </TabsList>
       </div>
+
+      <TabsContent value="Photo Recipe" className="mt-6 px-4 min-h-screen">
+        <Card className="max-w-3xl mx-auto">
+          <CardHeader>
+            <CardTitle>Generate Recipe from Photo</CardTitle>
+            <CardDescription>
+              Upload a photo of your dish and our AI will generate a detailed
+              recipe based on it.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <input
+                type="file"
+                ref={fileInputRef}
+                accept="image/*"
+                onChange={handleFileChange}
+                className="hidden"
+              />
+
+              <div
+                onClick={triggerFileInput}
+                className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:bg-gray-50 transition-colors"
+              >
+                {photoPreview ? (
+                  <div className="space-y-4">
+                    <img
+                      src={photoPreview}
+                      alt="Food preview"
+                      className="mx-auto max-h-64 rounded-lg"
+                    />
+                    <p className="text-sm text-gray-500">
+                      Click to change image
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    <Image className="h-12 w-12 mx-auto text-gray-400" />
+                    <p className="text-gray-500">
+                      Click to upload a photo of your dish
+                    </p>
+                    <p className="text-xs text-gray-400">
+                      JPG, PNG, GIF up to 10MB
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              <Button
+                onClick={handlePhotoUpload}
+                disabled={!photoPreview || isUploadingPhoto}
+                className="w-full"
+              >
+                {isUploadingPhoto ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Analyzing Photo...
+                  </>
+                ) : (
+                  <>
+                    <Camera className="mr-2 h-4 w-4" />
+                    Generate Recipe from Photo
+                  </>
+                )}
+              </Button>
+            </div>
+
+            {photoResponse && (
+              <div className="mt-6 p-4 bg-gray-50 rounded-lg">
+                <h3 className="text-lg font-semibold mb-2">
+                  Generated Recipe:
+                </h3>
+                <div className="prose prose-sm">
+                  <pre className="text-sm whitespace-pre-wrap">
+                    {photoResponse}
+                  </pre>
+                </div>
+              </div>
+            )}
+          </CardContent>
+          <CardFooter className="text-sm text-gray-500">
+            For best results, use a clear photo with good lighting.
+          </CardFooter>
+        </Card>
+      </TabsContent>
 
       <TabsContent value="AI Recipe" className="mt-6 px-4 min-h-screen">
         <Card className="max-w-3xl mx-auto">
@@ -494,23 +639,6 @@ export default function NewRecipePage({}) {
                   className="mt-1 w-full rounded-lg border border-gray-300 p-2"
                 />
               </div>
-            </div>
-
-            <div className="flex gap-2">
-              <button
-                type="button"
-                onClick={startRecording}
-                className="bg-blue-500 text-white px-4 py-2 rounded"
-              >
-                Start Recording
-              </button>
-              <button
-                type="button"
-                onClick={stopRecording}
-                className="bg-red-500 text-white px-4 py-2 rounded"
-              >
-                Stop Recording
-              </button>
             </div>
 
             <button

@@ -13,17 +13,10 @@ difficulty: A string that must be one of 'easy', 'medium', or 'hard'. If not spe
 cuisine: A non-empty string. If missing, use 'General'.
 author: A non-empty string. If missing, default to 'Anonymous'.
 
-You need to decide whether user input is full or not and call two tools: enhance-recipe, add-recipe-to-db. Input will consist of two parts: current input and previous input.
-You need to understand that such and similar inputs are considered full recipe and you shouldn't call enhance-recipe:
-Coca cola cake this is the name of the recipe. It is my family's traditional dish this is description.
-Coca cola: 300 ml,
-cake from happy cake company: 200 g,
-just add them and place to freezer,
-it should be staying there for 120 minutes
-1 serving only,
-i thinnk it's easy,
-it's kazakh cousine, 
-Author is Zhansar,
+You have two tools: add-recipe-to-db and enhance-recipe. Choose two of them. Choose enhance recipe if recipe isn't full. here is example of not full recipe:
+Coca cola cake. my family dish
+example of full recipe:
+Coca cola cake. my family dish. Kazakh cousine, you need only 3l of cola, 1 cake, add them together and place it in freezer for 2 hours.
 User's input:
 `;
 
