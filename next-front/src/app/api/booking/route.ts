@@ -40,7 +40,7 @@ export async function POST(request: Request) {
     const prompt = bookingPrompt.replace('{restaurant}', restaurant);
 
     const completion = await openai.chat.completions.create({
-      model: "gpt-3.5-turbo",
+      model: "gpt-4o-mini",
       messages: [
         {
           role: "system",
@@ -53,39 +53,29 @@ export async function POST(request: Request) {
     const analysis = JSON.parse(completion.choices[0].message.content || '{}');
     console.log('Результат анализа:', analysis);
 
-    // Получаем текущее время в формате HH:mm
     const now = new Date();
     const currentTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
 
-    // Если время не указано или указано как "текущее время", используем текущее время
     if (!analysis.time || analysis.time.includes('текущее время')) {
       analysis.time = currentTime;
     }
 
-    // Если дата не указана, используем "сегодня"
     if (!analysis.date) {
       analysis.date = "сегодня";
     }
 
-    // Если количество не указано, используем 1
     if (!analysis.quantity) {
       analysis.quantity = 1;
     }
 
-    // Добавляем информацию о ресторане
     analysis.restaurant = restaurant;
 
-    // Добавляем статус заказа
     analysis.status = 'pending';
 
-    // Добавляем timestamp создания заказа
     analysis.createdAt = new Date().toISOString();
 
     console.log('Финальные данные заказа:', analysis);
 
-    // Здесь можно добавить сохранение в базу данных
-    // Например:
-    // await db.orders.create(analysis);
 
     return NextResponse.json({
       success: true,

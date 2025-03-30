@@ -61,10 +61,8 @@ export async function POST(request: Request) {
 
     const response = completion.choices[0].message.content;
 
-    // Парсим ответ для обновления данных бронирования
     let updatedBookingData = { ...bookingData };
 
-    // Проверяем, содержит ли ответ информацию о ресторане
     if (response?.toLowerCase().includes('ресторан') && !bookingData.restaurant) {
       const restaurantMatch = restaurants.find(r =>
         response.toLowerCase().includes(r.toLowerCase())
@@ -74,16 +72,13 @@ export async function POST(request: Request) {
       }
     }
 
-    // Проверяем, содержит ли ответ информацию о рецепте
     if (response?.toLowerCase().includes('рецепт') && !bookingData.recipe) {
-      // Здесь можно добавить логику поиска рецепта в базе данных
       const recipeMatch = response.match(/рецепт "([^"]+)"/i);
       if (recipeMatch) {
         updatedBookingData.recipe = recipeMatch[1];
       }
     }
 
-    // Проверяем, содержит ли ответ информацию о дате
     if (response?.toLowerCase().includes('дата') && !bookingData.date) {
       const dateMatch = response.match(/(\d{1,2}\.\d{1,2}\.\d{4})/);
       if (dateMatch) {
@@ -91,7 +86,6 @@ export async function POST(request: Request) {
       }
     }
 
-    // Проверяем, содержит ли ответ информацию о времени
     if (response?.toLowerCase().includes('время') && !bookingData.time) {
       const timeMatch = response.match(/(\d{1,2}:\d{2})/);
       if (timeMatch) {
@@ -99,7 +93,6 @@ export async function POST(request: Request) {
       }
     }
 
-    // Проверяем, содержит ли ответ информацию о количестве гостей
     if (response?.toLowerCase().includes('гост') && !bookingData.guests) {
       const guestsMatch = response.match(/(\d+)\s*(?:гост|человек)/i);
       if (guestsMatch) {

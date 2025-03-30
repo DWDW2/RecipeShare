@@ -12,7 +12,7 @@ const containerStyle = {
 };
 
 const defaultCenter = {
-  lat: 55.7558, // Измените на координаты вашего города
+  lat: 55.7558, 
   lng: 37.6173
 };
 
@@ -20,8 +20,8 @@ interface Restaurant {
   name: string;
   position: google.maps.LatLngLiteral;
   address: string;
-  distance?: number; // в метрах
-  duration?: number; // в секундах
+  distance?: number;
+  duration?: number; 
   rating?: number;
   phone?: string;
 }
@@ -39,7 +39,6 @@ export default function RestaurantsPage() {
     libraries: ['places']
   });
 
-  // Изменим функцию getDeliveryInfo
   const getDeliveryInfo = async (
     origin: google.maps.LatLngLiteral,
     destinations: google.maps.LatLngLiteral[]
@@ -89,7 +88,6 @@ export default function RestaurantsPage() {
               },
               async (results, status) => {
                 if (status === google.maps.places.PlacesServiceStatus.OK && results) {
-                  // Сначала установим базовый список ресторанов
                   const basicRestaurantList = results.map(place => ({
                     name: place.name!,
                     position: {
@@ -100,10 +98,8 @@ export default function RestaurantsPage() {
                     rating: place.rating
                   }));
 
-                  // Устанавливаем рестораны сразу, чтобы они появились на карте
                   setRestaurants(basicRestaurantList);
 
-                  // Затем получаем дополнительную информацию о расстояниях
                   try {
                     const destinations = basicRestaurantList.map(r => r.position);
                     const distanceResults = await getDeliveryInfo(userPos, destinations);
@@ -123,7 +119,6 @@ export default function RestaurantsPage() {
                     }
                   } catch (error) {
                     console.error('Error updating restaurants with distance info:', error);
-                    // Базовый список ресторанов уже отображается, так что пользователь все равно что-то видит
                   }
                 }
               }

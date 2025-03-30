@@ -8,7 +8,6 @@ const oauth2Client = new OAuth2Client(
   process.env.GOOGLE_REDIRECT_URI
 );
 
-// Устанавливаем учетные данные
 oauth2Client.setCredentials({
   access_token: process.env.GOOGLE_ACCESS_TOKEN,
   refresh_token: process.env.GOOGLE_REFRESH_TOKEN,
@@ -111,7 +110,6 @@ export async function POST(request: Request) {
   } catch (error: any) {
     console.error('Error:', error);
 
-    // Добавляем более подробную информацию об ошибке
     const errorMessage = error.response?.data?.error?.message || error.message || 'Произошла ошибка при добавлении события в календарь';
 
     return NextResponse.json(
